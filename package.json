@@ -1,0 +1,15 @@
+{
+  "name": "audio-switcher",
+  "version": "1.0.0",
+  "main": "index.html",
+  "author": "Steve Occhipinti",
+  "license": "MIT",
+  "dependencies": {
+    "parcel-bundler": "^1.12.3",
+    "parcel-plugin-inliner": "^1.0.10"
+  },
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html --public-url ."
+  }
+}
