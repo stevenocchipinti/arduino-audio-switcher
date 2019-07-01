@@ -1,10 +1,27 @@
 let state = false
 const speakerEl = document.querySelector(".speaker")
 
-speakerEl.addEventListener(
-  "click",
-  e => {
-    state ? speakerEl.classList.remove("off") : speakerEl.classList.add("off")
-    state = !state
-  }
-)
+const render = () =>
+  state ? speakerEl.classList.remove("off") : speakerEl.classList.add("off")
+
+setInterval(() => (
+  fetch("/state.json")
+    .then(response => response.json())
+    .then(data => {
+      state = data.switch
+      render()
+    })
+), 1000)
+
+speakerEl.addEventListener("click", e => {
+  // Eager update
+  state = !state
+  render()
+
+  fetch(state ? "/on" : "/off", {method: "POST"})
+    .then(response => response.json())
+    .then(data => {
+      state = data.switch
+      render()
+    })
+})
