@@ -18,17 +18,28 @@ body {
   height: 400px;
 }
 
-.speaker .wave {
+.speaker__wave, .speaker__shadow {
   transition: all 0.3s;
   transform-origin: left;
 }
 
-.speaker.off .wave1 {
+.speaker.off .speaker__wave--small, .speaker.off .speaker__shadow--small {
   transform: translateX(-10px);
 }
-.speaker.off .wave2 {
+.speaker.off .speaker__wave--medium, .speaker.off .speaker__shadow--medium {
   transform: translateX(-10px) scale(0.8);
 }
-.speaker.off .wave3 {
+.speaker.off .speaker__wave--large, .speaker.off .speaker__shadow--large {
   transform: translateX(-3px) scale(0.6);
 }
+
+
+
+.speaker__circle{fill:#bbb;}
+.speaker__shadow{opacity:0.2;}
+.speaker__cone{fill:#4F5D73;}
+.speaker__wave{fill:none;stroke-width:3;stroke-linecap:round;stroke-miterlimit:10;}
+
+.speaker__wave--small{stroke:#FFFFFF;}
+.speaker__wave--medium{stroke:#E0E0D1;}
+.speaker__wave--large{stroke:#e4dac7;}
