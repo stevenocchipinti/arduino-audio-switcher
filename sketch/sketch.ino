@@ -7,7 +7,7 @@
 #include "./html.h"
 
 const int buttonPin = 16;
-const int ledPin = 15;
+const int ledPin = 13;
 
 bool state = LOW;
 bool buttonWasPressed = false;
@@ -43,7 +43,7 @@ void setup(void) {
   });
 
   server.on("/state.json", HTTP_GET, []() {
-    server.send(200, "application/json", (String)"{\"switch\": " + state + "}");
+    server.send(200, "application/json", (String)"{\"switch\": " + (state ? "true" : "false") + "}");
   });
 
   server.on("/on.json", HTTP_POST, []() {

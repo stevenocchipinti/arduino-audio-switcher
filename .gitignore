@@ -2,6 +2,6 @@ dist/
 node_modules/
 .cache/
 build/
-arduino/config.h
-arduino/*.bin
-arduino/*.elf
+sketch/config.h
+sketch/*.bin
+sketch/*.elf
