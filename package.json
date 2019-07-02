@@ -10,8 +10,10 @@
   },
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html --public-url .",
-    "compile": "arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 TestSketch.ino",
-    "upload": "arduino-cli upload -p /dev/ttyACM0 --fqbn esp8266:esp8266:nodemcuv2 TestSketch.ino"
+    "build": "yarn build-web && yarn package-html && yarn compile",
+    "build-web": "parcel build src/index.html --public-url .",
+    "package-html": "script/html-to-h.sh dist/index.html > arduino/html.h",
+    "compile": "arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 arduino/sketch.ino",
+    "upload": "arduino-cli upload -p /dev/ttyACM0 --fqbn esp8266:esp8266:nodemcuv2 arduino/sketch.ino"
   }
 }

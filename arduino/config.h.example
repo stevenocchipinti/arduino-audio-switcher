@@ -1,0 +1,2 @@
+const char* SSID = "SSID-GOES-HERE";
+const char* PASSWORD = "PASSWORD-GOES-HERE";
