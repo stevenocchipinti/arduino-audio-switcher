@@ -2,3 +2,6 @@ dist/
 node_modules/
 .cache/
 build/
+sketch/config.h
+sketch/*.bin
+sketch/*.elf

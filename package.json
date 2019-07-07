@@ -1,7 +1,7 @@
 {
   "name": "audio-switcher",
   "version": "1.0.0",
-  "main": "index.html",
+  "main": "src/index.html",
   "author": "Steve Occhipinti",
   "license": "MIT",
   "dependencies": {
@@ -9,7 +9,11 @@
     "parcel-plugin-inliner": "^1.0.10"
   },
   "scripts": {
-    "start": "parcel index.html",
-    "build": "parcel build index.html --public-url ."
+    "start": "parcel src/index.html",
+    "build": "yarn build-web && yarn package-html && yarn compile",
+    "build-web": "parcel build src/index.html --public-url .",
+    "package-html": "script/html-to-h.sh dist/index.html > sketch/html.h",
+    "compile": "arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 sketch/sketch.ino",
+    "upload": "arduino-cli upload -p /dev/ttyACM0 --fqbn esp8266:esp8266:nodemcuv2 sketch/sketch.ino"
   }
 }
