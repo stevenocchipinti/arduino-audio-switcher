@@ -33,6 +33,8 @@ build of the `arduino-cli` for this project.
 Building, compiling and uploading
 ---------------------------------
 
+:warning: Currently `build` works but `upload` doesn't. :man_shrugging:
+
 To get the completed code on to the arduino:
 
 ```
