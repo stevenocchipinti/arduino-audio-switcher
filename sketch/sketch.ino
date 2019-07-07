@@ -6,26 +6,48 @@
 #include "./config.h"
 #include "./html.h"
 
-const int buttonPin = 16;
-const int ledPin = 13;
+const int buttonPin = D0; // Pin 16;
+const int relayPin = D7;  // Pin 13;
+const int ledPin = D6;  // Pin 13;
 
-bool state = LOW;
+bool state = false;
 bool buttonWasPressed = false;
 
 ESP8266WebServer server(80);
 
+void setOutput(bool output) {
+  // I'm using the "state" as a logical flag, such that:
+  //  true  = relay on
+  //  false = relay off
+
+  // However, the relay board activates when the input is pulled LOW, such that:
+  //  LOW   = relay on
+  //  HIGH  = relay off
+
+  // Hence, the boolean is being negated
+  digitalWrite(relayPin, !output);
+  digitalWrite(ledPin, output);
+}
+
 void setup(void) {
   pinMode(buttonPin, INPUT_PULLDOWN_16);
   pinMode(ledPin, OUTPUT);
+  pinMode(relayPin, OUTPUT);
+
+  // Start with the relay off
+  setOutput(state);
 
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PASSWORD);
 
   Serial.println("");
+  bool flashIndicator = LOW;
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
     Serial.print(".");
+    digitalWrite(ledPin, flashIndicator);
+    flashIndicator = !flashIndicator;
+    delay(250);
   }
   Serial.println("");
   Serial.print("Connected to ");
@@ -43,7 +65,10 @@ void setup(void) {
   });
 
   server.on("/state.json", HTTP_GET, []() {
-    server.send(200, "application/json", (String)"{\"switch\": " + (state ? "true" : "false") + "}");
+    server.send(
+      200,
+      "application/json",
+      (String)"{\"switch\": " + (state ? "true" : "false") + "}");
   });
 
   server.on("/on.json", HTTP_POST, []() {
@@ -65,7 +90,7 @@ void setup(void) {
 }
 
 void loop(void) {
-  digitalWrite(ledPin, state);
+  setOutput(state);
 
   if (!buttonWasPressed && digitalRead(buttonPin) == HIGH) {
     buttonWasPressed = true;
