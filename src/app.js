@@ -1,15 +1,17 @@
-let state = false
+let speakers = false
 const speakerEl = document.querySelector(".speaker")
+const blindsUpEl = document.querySelector(".blinds-up")
+const blindsDownEl = document.querySelector(".blinds-down")
 
 const render = () =>
-  state ? speakerEl.classList.remove("off") : speakerEl.classList.add("off")
+  speakers ? speakerEl.classList.remove("off") : speakerEl.classList.add("off")
 
 setInterval(
   () =>
     fetch("/state.json")
       .then(response => response.json())
       .then(data => {
-        state = data.switch
+        speakers = data.speakers
         render()
       }),
   1000
@@ -17,13 +19,18 @@ setInterval(
 
 speakerEl.addEventListener("click", e => {
   // Eager update
-  state = !state
+  speakers = !speakers
   render()
 
-  fetch(state ? "/on.json" : "/off.json", { method: "POST" })
+  fetch(speakers ? "/on.json" : "/off.json", { method: "POST" })
     .then(response => response.json())
     .then(data => {
-      state = data.switch
+      speakers = data.speakers
       render()
     })
 })
+
+blindsUpEl.addEventListener("click", e => fetch("/up.json", { method: "POST" }))
+blindsDownEl.addEventListener("click", e =>
+  fetch("/down.json", { method: "POST" })
+)

@@ -6,36 +6,46 @@
 #include "./config.h"
 #include "./html.h"
 
-const int buttonPin = D0; // Pin 16;
-const int relayPin = D7;  // Pin 13;
-const int ledPin = D6;  // Pin 13;
+const int buttonPin = D0;       // Pin 16
+const int ledPin = D6;          // Pin 12
+const int relaysPin = D7;       // Pin 13
+const int blindsUpPin = D1;     // Pin 5
+const int blindsDownPin = D2;   // Pin 4
 
-bool state = false;
-bool buttonWasPressed = false;
+bool relays = false;            // Accurate state of the relays
+String blinds = "unknown";      // Last known state of the blinds
+bool buttonWasPressed = false;  // Used for debouncing
 
 ESP8266WebServer server(80);
 
-void setOutput(bool output) {
+void setRelays() {
   // I'm using the "state" as a logical flag, such that:
-  //  true  = relay on
-  //  false = relay off
-
+  //    true  = relay on
+  //    false = relay off
   // However, the relay board activates when the input is pulled LOW, such that:
-  //  LOW   = relay on
-  //  HIGH  = relay off
-
+  //    LOW   = relay on
+  //    HIGH  = relay off
   // Hence, the boolean is being negated
-  digitalWrite(relayPin, !output);
-  digitalWrite(ledPin, output);
+  digitalWrite(relaysPin, !relays);
+  digitalWrite(ledPin, relays);
+}
+
+String stateJSON() {
+  return (String)"{"
+    + "\"speakers\": " + (relays ? "true" : "false") + ","
+    + "\"blinds\": \"" + blinds + "\""
+    + "}";
 }
 
 void setup(void) {
   pinMode(buttonPin, INPUT_PULLDOWN_16);
   pinMode(ledPin, OUTPUT);
-  pinMode(relayPin, OUTPUT);
+  pinMode(relaysPin, OUTPUT);
+  pinMode(blindsUpPin, OUTPUT);
+  pinMode(blindsDownPin, OUTPUT);
 
-  // Start with the relay off
-  setOutput(state);
+  // Start with the relays off
+  setRelays();
 
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
@@ -65,20 +75,33 @@ void setup(void) {
   });
 
   server.on("/state.json", HTTP_GET, []() {
-    server.send(
-      200,
-      "application/json",
-      (String)"{\"switch\": " + (state ? "true" : "false") + "}");
+    server.send(200, "application/json", stateJSON());
   });
 
   server.on("/on.json", HTTP_POST, []() {
-    state = true;
-    server.send(200, "application/json", (String)"{\"switch\": true}");
+    relays = true;
+    server.send(200, "application/json", stateJSON());
   });
 
   server.on("/off.json", HTTP_POST, []() {
-    state = false;
-    server.send(200, "application/json", (String)"{\"switch\": false}");
+    relays = false;
+    server.send(200, "application/json", stateJSON());
+  });
+
+  server.on("/up.json", HTTP_POST, []() {
+    digitalWrite(blindsUpPin, HIGH);
+    delay(100);
+    digitalWrite(blindsUpPin, LOW);
+    blinds = "up";
+    server.send(200, "application/json", stateJSON());
+  });
+
+  server.on("/down.json", HTTP_POST, []() {
+    digitalWrite(blindsDownPin, HIGH);
+    delay(100);
+    digitalWrite(blindsDownPin, LOW);
+    blinds = "down";
+    server.send(200, "application/json", stateJSON());
   });
 
   server.onNotFound([]() {
@@ -90,11 +113,11 @@ void setup(void) {
 }
 
 void loop(void) {
-  setOutput(state);
+  setRelays();
 
   if (!buttonWasPressed && digitalRead(buttonPin) == HIGH) {
     buttonWasPressed = true;
-    state = !state;
+    relays = !relays;
     delay(50);
   }
 
