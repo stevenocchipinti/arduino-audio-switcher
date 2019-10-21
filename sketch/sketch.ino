@@ -6,7 +6,7 @@
 #include "./config.h"
 #include "./html.h"
 
-const int buttonPin = D0;       // Pin 16
+const int buttonPin = D5;       // Pin 14
 const int ledPin = D6;          // Pin 12
 const int relaysPin = D7;       // Pin 13
 const int blindsUpPin = D1;     // Pin 5
@@ -38,7 +38,7 @@ String stateJSON() {
 }
 
 void setup(void) {
-  pinMode(buttonPin, INPUT_PULLDOWN_16);
+  pinMode(buttonPin, INPUT_PULLUP);
   pinMode(ledPin, OUTPUT);
   pinMode(relaysPin, OUTPUT);
   pinMode(blindsUpPin, OUTPUT);
@@ -115,13 +115,13 @@ void setup(void) {
 void loop(void) {
   setRelays();
 
-  if (!buttonWasPressed && digitalRead(buttonPin) == HIGH) {
+  if (!buttonWasPressed && digitalRead(buttonPin) == LOW) {
     buttonWasPressed = true;
     relays = !relays;
     delay(50);
   }
 
-  if (buttonWasPressed && digitalRead(buttonPin) == LOW) {
+  if (buttonWasPressed && digitalRead(buttonPin) == HIGH) {
     buttonWasPressed = false;
     delay(50);
   }
